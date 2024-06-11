@@ -205,10 +205,10 @@ export default function Home() {
           context.fillStyle = `rgb(${r},${g},${b})`;
 
           if (scaleDown) {
-            const toHex = (num) => num.toString(16);
+            const toHex = (num: number) => num.toString(16);
 
             // Scaling down r, g, b values from 0-255 to 0-15
-            const scaleDown = (num) => Math.round(num / 17);
+            const scaleDown = (num: number) => Math.round(num / 17);
 
             // Converting to single hex digit and combining them
             const hexCode3 = `#${toHex(scaleDown(r))}${toHex(
@@ -222,7 +222,7 @@ export default function Home() {
               : currentMatrix.push(pixelData);
             context.fillRect(x, y, sample_size + 1, sample_size + 1);
           } else {
-            const toHex = (num) => num.toString(16).padStart(2, "0");
+            const toHex = (num: number) => num.toString(16).padStart(2, "0");
 
             const hexCode = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 
@@ -442,11 +442,11 @@ export default function Home() {
   }, [pixelSize, divider]);
 
   /** Bear with me on this one */
-  const saveDataToLocalStorage = (key, someData) => {
+  const saveDataToLocalStorage = (key: string, someData: string) => {
     localStorage[key] = JSON.stringify(someData);
   };
 
-  const removeDataFromLocalStorage = (key) => {
+  const removeDataFromLocalStorage = (key: string) => {
     localStorage.removeItem(key);
   };
 
@@ -531,7 +531,9 @@ export default function Home() {
           <div className="quality-buttons">
             <label htmlFor="">Quality</label>
             <select
-              onChange={(e) => setQuality(qualitySettings[e.target.value])}
+              onChange={(e) =>
+                setQuality(qualitySettings[e.target.value as any])
+              }
             >
               {qualitySettings.map((quality, index) => (
                 <option
