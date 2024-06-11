@@ -735,7 +735,7 @@ export default function Home() {
             <div className="Code">
               <pre className="p-2 bg-white">
                 <code className="language-css" ref={cssCodeRef}>
-                  // Click{" "}
+                  Click
                   <span className="bg-blue-500 text-white font-bold py-1 px-2 rounded">
                     Generate CSS
                   </span>
