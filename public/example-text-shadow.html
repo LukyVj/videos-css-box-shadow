@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Example</title>
+    <link rel="stylesheet" href="./example-text-shadow.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      #editing,
+      #highlighting {
+        /* Both elements need the same text and space styling so they are directly on top of each other */
+        margin: 10px;
+        padding: 10px;
+        border: 0;
+        width: calc(100% - 32px);
+      }
+
+      #editing,
+      #highlighting,
+      #highlighting * {
+        /* Also add text styles to highlighting tokens */
+        font-size: 15pt;
+        font-family: monospace;
+        line-height: 20pt;
+        tab-size: 2;
+      }
+
+      #editing,
+      #highlighting {
+        position: absolute;
+        top: 0;
+        left: 0;
+        overflow: auto;
+        white-space: nowrap; /* Allows textarea to scroll horizontally */
+      }
+
+      /* Move the textarea in front of the result */
+      #editing {
+        z-index: 1;
+        resize: none;
+      }
+
+      #highlighting {
+        z-index: 0;
+      }
+      #editing {
+        color: transparent;
+        background: transparent;
+        caret-color: white; /* Or choose your favorite color */
+      }
+    </style>
+  </head>
+  <body class="h-screen p-4">
+    <div class="grid grid-cols-2 h-screen gap-4">
+      <div>
+        <h1 class="text-3xl font-bold underline">
+          Video rendered with full CSS in a text shadow
+        </h1>
+        <p class="text-lg">
+          This example shows how to use text shadow to create a shadow effect on
+          text.
+        </p>
+        <p>You can edit the word "Hello" in the box below.</p>
+        <p>You can also edit the CSS in the box on the right.</p>
+
+        <p>
+          Try replacing the word "Hello" with your own text or one of these
+          characters: ■ ⚱
+        </p>
+        <input
+          type="text"
+          value="hello"
+          class="w-full p-2 my-2 border"
+          oninput="document.querySelector('.bxs-video').innerText=this.value"
+        />
+
+        <style id="applyStyles"></style>
+        <div
+          class="bxs-video-container bg-slate-300 w-[240px] h-[240px] text-pretty rounded-md overflow-y-hidden"
+        >
+          <header
+            class="p-2 flex bg-gradient-to-b from-slate-400 to-slate-500 rounded-t-md"
+          >
+            <span class="block red-dot rounded-full bg-red-500 w-2 h-2"></span>
+            <span
+              class="block yellow-dot rounded-full bg-yellow-500 w-2 h-2"
+            ></span>
+            <span
+              class="block green-dot rounded-full bg-green-500 w-2 h-2"
+            ></span>
+          </header>
+          <div class="bxs-video" contenteditable>Hello</div>
+        </div>
+      </div>
+
+      <div class="h-full">
+        <div class="w-full bg-slate-100 relative h-full">
+          <textarea
+            id="editing"
+            oninput="update(this.value); sync_scroll(this);"
+            onscroll="sync_scroll(this);"
+            onkeydown="check_tab(this, event);"
+            class="h-full"
+          >
+div.bxs-video {
+  animation: anim-shadow 10s steps(100, end) infinite;
+  text-shadow: var(--bxs-frame-0);
+  will-change: text-shadow;
+  color: transparent;
+}</textarea
+          >
+
+          <pre id="highlighting" aria-hidden="true" class="h-full">
+  <code class="language-css h-full" id="highlighting-content"></code>
+</pre>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const root = document.documentElement;
+      const codeElement = document.getElementById("editing");
+      const applyStyles = document.getElementById("applyStyles");
+
+      document.addEventListener("DOMContentLoaded", () => {
+        update(codeElement.value);
+      });
+
+      function sync_scroll(element) {
+        /* Scroll result to scroll coords of event - sync with textarea */
+        let result_element = document.querySelector("#highlighting");
+        // Get and set x and y
+        result_element.scrollTop = element.scrollTop;
+        result_element.scrollLeft = element.scrollLeft;
+      }
+
+      function update(text) {
+        applyStyles.innerText = text;
+        let result_element = document.querySelector("#highlighting-content");
+        // Handle final newlines (see article)
+        if (text[text.length - 1] == "\n") {
+          // If the last character is a newline character
+          text += " "; // Add a placeholder space character to the final line
+        }
+        // Update code
+        result_element.innerHTML = text
+          .replace(new RegExp("&", "g"), "&")
+          .replace(new RegExp("<", "g"), "<"); /* Global RegExp */
+        // Syntax Highlight
+        Prism.highlightElement(result_element);
+      }
+
+      function check_tab(element, event) {
+        let code = element.value;
+        if (event.key == "Tab") {
+          /* Tab key pressed */
+          event.preventDefault(); // stop normal
+          let before_tab = code.slice(0, element.selectionStart); // text before tab
+          let after_tab = code.slice(
+            element.selectionEnd,
+            element.value.length
+          ); // text after tab
+          let cursor_pos = element.selectionEnd + 1; // where cursor moves after tab - moving forward by 1 char to after tab
+          element.value = before_tab + "\t" + after_tab; // add tab char
+          // move cursor
+          element.selectionStart = cursor_pos;
+          element.selectionEnd = cursor_pos;
+          update(element.value); // Update text to include indent
+        }
+      }
+    </script>
+  </body>
+</html>
