@@ -64,7 +64,7 @@
   </head>
   <body class="h-screen p-4">
     <div class="grid grid-cols-2 h-screen gap-4">
-      <div>
+      <div class="relative">
         <h1 class="text-3xl font-bold underline">
           Video rendered with full CSS in a text shadow
         </h1>
@@ -88,7 +88,7 @@
 
         <style id="applyStyles"></style>
         <div
-          class="bxs-video-container bg-slate-300 w-[240px] h-[240px] text-pretty rounded-md overflow-y-hidden"
+          class="absolute z-10 cursor-move bxs-video-container bg-slate-300 w-[240px] h-[240px] text-pretty rounded-md overflow-y-hidden"
         >
           <header
             class="p-2 flex bg-gradient-to-b from-slate-400 to-slate-500 rounded-t-md"
@@ -180,6 +180,40 @@ div.bxs-video {
           update(element.value); // Update text to include indent
         }
       }
+
+      // Make it draggable
+
+      const draggableDiv = document.querySelector(".bxs-video-container");
+
+      draggableDiv.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+
+        let shiftX = e.clientX - draggableDiv.getBoundingClientRect().left;
+        let shiftY = e.clientY - draggableDiv.getBoundingClientRect().top;
+
+        function moveAt(pageX, pageY) {
+          draggableDiv.style.left = pageX - shiftX + "px";
+          draggableDiv.style.top = pageY - shiftY + "px";
+        }
+
+        function onMouseMove(e) {
+          moveAt(e.pageX, e.pageY);
+        }
+
+        document.addEventListener("mousemove", onMouseMove);
+
+        document.addEventListener(
+          "mouseup",
+          () => {
+            document.removeEventListener("mousemove", onMouseMove);
+          },
+          { once: true }
+        );
+      });
+
+      draggableDiv.addEventListener("dragstart", () => {
+        return false;
+      });
     </script>
   </body>
 </html>
